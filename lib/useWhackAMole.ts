@@ -6,6 +6,7 @@ const GAME_DURATION_SECONDS = 60;
 const INITIAL_DELAY_RANGE = [300, 600] as const;
 const APPEARANCE_INTERVAL_RANGE = [800, 1500] as const;
 const VISIBLE_DURATION_RANGE = [450, 750] as const;
+const RECENT_HIT_GRACE_MS = 240;
 
 type TimerRef = ReturnType<typeof setTimeout> | null;
 type IntervalRef = ReturnType<typeof setInterval> | null;
@@ -14,6 +15,7 @@ const useTimerRefs = () => {
   const gameTimerRef = useRef<IntervalRef>(null);
   const appearanceTimerRef = useRef<TimerRef>(null);
   const hideTimerRef = useRef<TimerRef>(null);
+  const recentlyHiddenTimerRef = useRef<TimerRef>(null);
 
   const clearTimers = useCallback(() => {
     if (gameTimerRef.current) {
@@ -28,12 +30,17 @@ const useTimerRefs = () => {
       clearTimeout(hideTimerRef.current);
       hideTimerRef.current = null;
     }
+    if (recentlyHiddenTimerRef.current) {
+      clearTimeout(recentlyHiddenTimerRef.current);
+      recentlyHiddenTimerRef.current = null;
+    }
   }, []);
 
   return {
     gameTimerRef,
     appearanceTimerRef,
     hideTimerRef,
+    recentlyHiddenTimerRef,
     clearTimers,
   };
 };
@@ -54,12 +61,18 @@ export const useWhackAMole = (): UseWhackAMoleState => {
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION_SECONDS);
   const [activeCell, setActiveCell] = useState<number | null>(null);
 
-  const { gameTimerRef, appearanceTimerRef, hideTimerRef, clearTimers } =
-    useTimerRefs();
+  const {
+    gameTimerRef,
+    appearanceTimerRef,
+    hideTimerRef,
+    recentlyHiddenTimerRef,
+    clearTimers,
+  } = useTimerRefs();
 
   const isRunningRef = useRef(false);
   const previousCellRef = useRef<number | null>(null);
   const activeCellRef = useRef<number | null>(null);
+  const recentlyHiddenCellRef = useRef<number | null>(null);
 
   useEffect(() => {
     activeCellRef.current = activeCell;
@@ -70,6 +83,7 @@ export const useWhackAMole = (): UseWhackAMoleState => {
     isRunningRef.current = false;
     setIsRunning(false);
     setActiveCell(null);
+    recentlyHiddenCellRef.current = null;
   }, [clearTimers]);
 
   const scheduleNextAppearance = useCallback(() => {
@@ -92,6 +106,14 @@ export const useWhackAMole = (): UseWhackAMoleState => {
 
     hideTimerRef.current = setTimeout(() => {
       setActiveCell((current) => (current === nextCell ? null : current));
+      recentlyHiddenCellRef.current = nextCell;
+      if (recentlyHiddenTimerRef.current) {
+        clearTimeout(recentlyHiddenTimerRef.current);
+      }
+      recentlyHiddenTimerRef.current = setTimeout(() => {
+        recentlyHiddenCellRef.current = null;
+        recentlyHiddenTimerRef.current = null;
+      }, RECENT_HIT_GRACE_MS);
     }, visibleDuration);
 
     const nextInterval = randomBetween(
@@ -103,7 +125,7 @@ export const useWhackAMole = (): UseWhackAMoleState => {
       scheduleNextAppearance,
       nextInterval,
     );
-  }, [appearanceTimerRef, hideTimerRef]);
+  }, [appearanceTimerRef, hideTimerRef, recentlyHiddenTimerRef]);
 
   const startGame = useCallback(() => {
     clearTimers();
@@ -111,6 +133,7 @@ export const useWhackAMole = (): UseWhackAMoleState => {
     setTimeLeft(GAME_DURATION_SECONDS);
     setActiveCell(null);
     previousCellRef.current = null;
+    recentlyHiddenCellRef.current = null;
 
     setIsRunning(true);
     isRunningRef.current = true;
@@ -144,30 +167,41 @@ export const useWhackAMole = (): UseWhackAMoleState => {
 
   const registerHit = useCallback(
     (cellIndex: number) => {
-      if (
-        !isRunningRef.current ||
-        activeCellRef.current === null ||
-        activeCellRef.current !== cellIndex
-      ) {
+      if (!isRunningRef.current) {
+        return false;
+      }
+
+      const isDirectHit =
+        activeCellRef.current !== null &&
+        activeCellRef.current === cellIndex;
+      const isGraceHit = recentlyHiddenCellRef.current === cellIndex;
+
+      if (!isDirectHit && !isGraceHit) {
         return false;
       }
 
       setScore((current) => current + 1);
       setActiveCell(null);
+      recentlyHiddenCellRef.current = null;
 
       if (hideTimerRef.current) {
         clearTimeout(hideTimerRef.current);
         hideTimerRef.current = null;
       }
+      if (recentlyHiddenTimerRef.current) {
+        clearTimeout(recentlyHiddenTimerRef.current);
+        recentlyHiddenTimerRef.current = null;
+      }
 
       return true;
     },
-    [hideTimerRef],
+    [hideTimerRef, recentlyHiddenTimerRef],
   );
 
   useEffect(() => {
     return () => {
       clearTimers();
+      recentlyHiddenCellRef.current = null;
     };
   }, [clearTimers]);
 
@@ -181,4 +215,3 @@ export const useWhackAMole = (): UseWhackAMoleState => {
     registerHit,
   };
 };
-

@@ -52,3 +52,194 @@ button {
 .score-burst[data-active="true"] {
   animation: hit-bounce 0.4s ease-out;
 }
+
+.hit-pop {
+  animation: hit-pop-rise 0.7s cubic-bezier(0.21, 0.97, 0.36, 1);
+}
+
+.hit-pop__burst {
+  opacity: 0;
+  transform: scale(0.4);
+  animation: hit-burst-ring 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hit-pop__burst--inner {
+  animation-delay: 80ms;
+}
+
+.hit-pop__burst--outer {
+  box-shadow:
+    0 0 0 6px rgba(252, 211, 77, 0.35),
+    0 0 0 14px rgba(253, 186, 116, 0.2);
+}
+
+.hit-pop__shockwave {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+  opacity: 0;
+  animation: hit-shockwave 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hit-pop__spark {
+  opacity: 0;
+  transform: scale(0.3);
+  animation: hit-spark 0.6s ease-out forwards;
+}
+
+.hit-pop__spark--right {
+  animation-delay: 120ms;
+}
+
+.hit-pop__spark--left {
+  animation-delay: 150ms;
+}
+
+.hit-pop__spark--bottom {
+  animation-delay: 180ms;
+}
+
+.hit-pop__confetti {
+  position: absolute;
+  width: 6px;
+  height: 12px;
+  border-radius: 4px;
+  opacity: 0;
+  animation: hit-confetti 0.7s ease-out forwards;
+}
+
+.hit-pop__confetti--one {
+  top: -6px;
+  left: 24%;
+  background: linear-gradient(180deg, #fde047 0%, #fb923c 100%);
+  animation-delay: 40ms;
+}
+
+.hit-pop__confetti--two {
+  top: 6px;
+  right: 18%;
+  background: linear-gradient(180deg, #fca5a5 0%, #fb7185 100%);
+  animation-delay: 120ms;
+}
+
+.hit-pop__confetti--three {
+  bottom: -4px;
+  left: 20%;
+  background: linear-gradient(180deg, #a855f7 0%, #6366f1 100%);
+  animation-delay: 180ms;
+}
+
+.hit-pop__confetti--four {
+  bottom: 10px;
+  right: 32%;
+  background: linear-gradient(180deg, #4ade80 0%, #22d3ee 100%);
+  animation-delay: 240ms;
+}
+
+.hit-pop__text {
+  opacity: 0;
+  transform: translateY(14px) scale(0.6);
+  animation: hit-text-pop 0.72s cubic-bezier(0.21, 0.97, 0.36, 1) forwards;
+  text-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+@keyframes hit-pop-rise {
+  0% {
+    transform: translateY(18px) scale(0.85);
+  }
+  60% {
+    transform: translateY(-4px) scale(1.05);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes hit-burst-ring {
+  0% {
+    opacity: 0;
+    transform: scale(0.35) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35) rotate(12deg);
+  }
+}
+
+@keyframes hit-shockwave {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  40% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+@keyframes hit-spark {
+  0% {
+    opacity: 0;
+    transform: scale(0) translateY(6px);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1) translateY(-12px);
+  }
+}
+
+@keyframes hit-confetti {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.4) rotate(0deg);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-26px) scale(1) rotate(45deg);
+  }
+}
+
+@keyframes hit-text-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.7) rotate(-10deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.1) rotate(-4deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.9) rotate(-8deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hit-pop,
+  .hit-pop__burst,
+  .hit-pop__spark,
+  .hit-pop__text,
+  .hit-pop__shockwave,
+  .hit-pop__confetti {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@media (pointer: fine) {
+  .hammer-cursor {
+    cursor: url("/hammer-cursor.svg") 12 6, pointer;
+  }
+}

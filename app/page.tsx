@@ -5,7 +5,7 @@ import { ControlPanel } from "@/components/ControlPanel";
 import { GameBoard } from "@/components/GameBoard";
 import { useWhackAMole } from "@/lib/useWhackAMole";
 
-const HIT_FEEDBACK_MS = 220;
+const HIT_FEEDBACK_MS = 720;
 
 export default function Page() {
   const { isRunning, score, timeLeft, activeCell, startGame, registerHit } =
