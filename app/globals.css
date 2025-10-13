@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0)) no-repeat,
+      linear-gradient(180deg, #d8f6a5 0%, #a7e163 35%, #4cc48d 100%) no-repeat;
+  color: #2f3c2f;
+  font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic",
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+.meadow-grid {
+  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 65%),
+    linear-gradient(180deg, #b8ef83 0%, #8cd85a 50%, #58c387 100%);
+}
+
+.score-burst::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+
+.score-burst[data-active="true"]::after {
+  opacity: 1;
+}
+
+.score-burst[data-active="true"] {
+  animation: hit-bounce 0.4s ease-out;
+}
