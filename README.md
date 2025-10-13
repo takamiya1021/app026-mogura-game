@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎮 モグラ叩きゲーム (Whack-A-Mole Game)
 
-## Getting Started
+Next.js + TypeScript + Tailwind CSS で作られた、シンプルで楽しいモグラ叩きゲームです。
 
-First, run the development server:
+![ゲーム画面](png/game-screenshot.png)
+
+## ✨ 特徴
+
+- **60秒間のチャレンジ**: 制限時間内にできるだけ多くのモグラを叩こう
+- **3×3のゲームボード**: ランダムに現れるモグラをタップ/クリックで叩く
+- **リアルタイムスコア**: 叩いたモグラの数をリアルタイムで表示
+- **ヒットフィードバック**: モグラを叩くと視覚的にフィードバック
+- **レスポンシブデザイン**: スマホ・タブレット・PCで快適にプレイ可能
+
+## 🚀 クイックスタート
+
+### 開発サーバーの起動
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで [http://localhost:3000](http://localhost:3000) を開いてゲームをプレイできます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### ビルド
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## 🛠️ 技術スタック
 
-To learn more about Next.js, take a look at the following resources:
+- **Next.js 14.2** - React フレームワーク
+- **React 18** - UI ライブラリ
+- **TypeScript** - 型安全な開発
+- **Tailwind CSS** - ユーティリティファーストCSS
+- **ESLint** - コード品質管理
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📁 プロジェクト構造
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+app026-mogura-game/
+├── app/
+│   ├── layout.tsx          # アプリケーションレイアウト
+│   └── page.tsx            # メインゲームページ
+├── components/
+│   ├── ControlPanel.tsx    # スコア・タイマー表示パネル
+│   ├── GameBoard.tsx       # 3×3ゲームボード
+│   └── Mole.tsx            # モグラコンポーネント
+├── lib/
+│   ├── random.ts           # ランダム数生成ユーティリティ
+│   └── useWhackAMole.ts    # ゲームロジックカスタムフック
+└── public/                 # 静的ファイル
+```
 
-## Deploy on Vercel
+## 🎯 ゲームルール
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. **スタート**: 「スタート」ボタンを押してゲーム開始
+2. **叩く**: 3×3の穴からランダムに現れるモグラをタップ/クリック
+3. **スコア**: モグラを叩くたびにスコアが+1
+4. **制限時間**: 60秒間でできるだけ多くのモグラを叩こう
+5. **終了**: 時間切れで結果表示、再挑戦してベストスコアを目指そう
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🎨 カスタマイズ
+
+### ゲーム設定の変更
+
+`lib/useWhackAMole.ts` で以下の設定を変更できます：
+
+- **制限時間**: `GAME_DURATION_SEC` (デフォルト: 60秒)
+- **モグラ表示時間**: `MOLE_DISPLAY_MS` の範囲 (500ms〜1500ms)
+
+### ヒットフィードバック時間
+
+`app/page.tsx` の `HIT_FEEDBACK_MS` でヒットアニメーションの表示時間を調整できます。
+
+## 📝 ライセンス
+
+このプロジェクトはプライベートプロジェクトです。
+
+## 🙏 クレジット
+
+このゲームは学習・練習目的で作成されました。
