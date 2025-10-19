@@ -7,6 +7,7 @@ type ControlPanelProps = {
   timeLeft: number;
   isRunning: boolean;
   onStart: () => void;
+  onStop: () => void;
   scoreHighlight: boolean;
 };
 
@@ -22,11 +23,12 @@ const ControlPanelComponent = ({
   timeLeft,
   isRunning,
   onStart,
+  onStop,
   scoreHighlight,
 }: ControlPanelProps) => {
   const isGameOver = !isRunning && timeLeft === 0;
   const buttonLabel = isRunning
-    ? "プレイ中..."
+    ? "ストップ"
     : isGameOver
       ? "もう一回！"
       : "スタート";
@@ -64,9 +66,8 @@ const ControlPanelComponent = ({
 
         <button
           type="button"
-          onClick={onStart}
-          disabled={isRunning}
-          className="group relative mt-2 flex h-14 items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-500 text-lg font-bold text-white shadow-lg transition-transform duration-150 hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-200 disabled:cursor-not-allowed disabled:opacity-70"
+          onClick={isRunning ? onStop : onStart}
+          className="group relative mt-2 flex h-14 items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-500 text-lg font-bold text-white shadow-lg transition-transform duration-150 hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-200"
         >
           <span className="absolute inset-0 bg-white/15 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
           <span className="relative z-10">{buttonLabel}</span>

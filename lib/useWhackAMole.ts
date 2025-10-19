@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { pickNextDistinctIndex, randomBetween } from "./random";
+import { useSoundEffect } from "./useSoundEffect";
 
 const GRID_SIZE = 9;
 const GAME_DURATION_SECONDS = 60;
@@ -45,6 +46,10 @@ const useTimerRefs = () => {
   };
 };
 
+export type UseWhackAMoleOptions = {
+  isSFXEnabled?: boolean;
+};
+
 export type UseWhackAMoleState = {
   isRunning: boolean;
   score: number;
@@ -55,7 +60,11 @@ export type UseWhackAMoleState = {
   registerHit: (cellIndex: number) => boolean;
 };
 
-export const useWhackAMole = (): UseWhackAMoleState => {
+export const useWhackAMole = (
+  options: UseWhackAMoleOptions = {},
+): UseWhackAMoleState => {
+  const { isSFXEnabled = true } = options;
+
   const [isRunning, setIsRunning] = useState(false);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION_SECONDS);
@@ -68,6 +77,8 @@ export const useWhackAMole = (): UseWhackAMoleState => {
     recentlyHiddenTimerRef,
     clearTimers,
   } = useTimerRefs();
+
+  const { playHitSound } = useSoundEffect({ isSFXEnabled });
 
   const isRunningRef = useRef(false);
   const previousCellRef = useRef<number | null>(null);
@@ -180,6 +191,9 @@ export const useWhackAMole = (): UseWhackAMoleState => {
         return false;
       }
 
+      // ヒット音を再生
+      playHitSound();
+
       setScore((current) => current + 1);
       setActiveCell(null);
       recentlyHiddenCellRef.current = null;
@@ -195,7 +209,7 @@ export const useWhackAMole = (): UseWhackAMoleState => {
 
       return true;
     },
-    [hideTimerRef, recentlyHiddenTimerRef],
+    [hideTimerRef, recentlyHiddenTimerRef, playHitSound],
   );
 
   useEffect(() => {

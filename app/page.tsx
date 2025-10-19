@@ -3,13 +3,29 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ControlPanel } from "@/components/ControlPanel";
 import { GameBoard } from "@/components/GameBoard";
+import { SoundSettings } from "@/components/SoundSettings";
 import { useWhackAMole } from "@/lib/useWhackAMole";
+import { useSoundEffect } from "@/lib/useSoundEffect";
+import { useSoundSettings } from "@/lib/useSoundSettings";
 
 const HIT_FEEDBACK_MS = 720;
 
 export default function Page() {
-  const { isRunning, score, timeLeft, activeCell, startGame, registerHit } =
-    useWhackAMole();
+  const { isBGMEnabled, isSFXEnabled, toggleBGM, toggleSFX } =
+    useSoundSettings();
+
+  const {
+    isRunning,
+    score,
+    timeLeft,
+    activeCell,
+    startGame,
+    stopGame,
+    registerHit,
+  } = useWhackAMole({ isSFXEnabled });
+
+  const { playBGM } = useSoundEffect({ isBGMEnabled, isSFXEnabled });
+  const bgmControlRef = useRef<{ stop: () => void } | null>(null);
 
   const [hitFeedbackIndex, setHitFeedbackIndex] = useState<number | null>(null);
   const [scoreHighlight, setScoreHighlight] = useState(false);
@@ -21,7 +37,23 @@ export default function Page() {
     setHitFeedbackIndex(null);
     setScoreHighlight(false);
     startGame();
-  }, [startGame]);
+
+    // BGMを開始
+    if (bgmControlRef.current) {
+      bgmControlRef.current.stop();
+    }
+    bgmControlRef.current = playBGM();
+  }, [startGame, playBGM]);
+
+  const handleStop = useCallback(() => {
+    stopGame();
+
+    // BGMを停止
+    if (bgmControlRef.current) {
+      bgmControlRef.current.stop();
+      bgmControlRef.current = null;
+    }
+  }, [stopGame]);
 
   const handleHit = useCallback(
     (cellIndex: number) => {
@@ -62,14 +94,38 @@ export default function Page() {
     if (!isRunning) {
       setHitFeedbackIndex(null);
       setScoreHighlight(false);
+
+      // BGMを停止
+      if (bgmControlRef.current) {
+        bgmControlRef.current.stop();
+        bgmControlRef.current = null;
+      }
     }
   }, [isRunning]);
+
+  // BGM設定変更時の処理
+  useEffect(() => {
+    if (isRunning) {
+      if (bgmControlRef.current) {
+        bgmControlRef.current.stop();
+        bgmControlRef.current = null;
+      }
+      if (isBGMEnabled) {
+        bgmControlRef.current = playBGM();
+      }
+    }
+  }, [isBGMEnabled, playBGM, isRunning]);
 
   useEffect(() => {
     return () => {
       if (scoreHighlightTimeoutRef.current) {
         clearTimeout(scoreHighlightTimeoutRef.current);
         scoreHighlightTimeoutRef.current = null;
+      }
+      // コンポーネントアンマウント時にBGMを停止
+      if (bgmControlRef.current) {
+        bgmControlRef.current.stop();
+        bgmControlRef.current = null;
       }
     };
   }, []);
@@ -109,6 +165,7 @@ export default function Page() {
         timeLeft={timeLeft}
         isRunning={isRunning}
         onStart={handleStart}
+        onStop={handleStop}
         scoreHighlight={scoreHighlight}
       />
 
@@ -117,6 +174,13 @@ export default function Page() {
         isRunning={isRunning}
         onHit={handleHit}
         hitFeedbackIndex={hitFeedbackIndex}
+      />
+
+      <SoundSettings
+        isBGMEnabled={isBGMEnabled}
+        isSFXEnabled={isSFXEnabled}
+        onToggleBGM={toggleBGM}
+        onToggleSFX={toggleSFX}
       />
 
       <footer className="w-full max-w-md rounded-3xl bg-white/70 p-5 text-center text-sm text-emerald-900 shadow-badge">

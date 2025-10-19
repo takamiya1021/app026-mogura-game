@@ -1,0 +1,10 @@
+# 親ディレクトリの影響を受けないようにする
+../.eslintrc.json
+
+# 標準的な無視パターン
+node_modules/
+.next/
+out/
+build/
+dist/
+next-env.d.ts
